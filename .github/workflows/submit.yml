@@ -1,0 +1,38 @@
+name: B12 Submission
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run submission script
+        env:
+          # Use secrets for sensitive information
+          B12_SIGNING_SECRET: ${{ secrets.B12_SIGNING_SECRET }}
+          # These can be secrets or hardcoded if they are not sensitive
+          APPLICATION_NAME: ${{ vars.APPLICATION_NAME }}
+          APPLICATION_EMAIL: ${{ vars.APPLICATION_EMAIL }}
+          APPLICATION_RESUME_LINK: ${{ vars.APPLICATION_RESUME_LINK }}
+          # GitHub provides these automatically
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        run: python submit.py
